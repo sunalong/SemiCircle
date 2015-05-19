@@ -1,6 +1,5 @@
 package com.itcode.semiCircle;
 
-import com.itcode.halfCircle.R;
 
 import android.app.Activity;
 import android.os.Bundle;
