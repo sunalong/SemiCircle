@@ -1,11 +1,15 @@
 package com.itcode.semiCircle;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class MyDrawSemicircle extends View {
@@ -34,11 +38,23 @@ public class MyDrawSemicircle extends View {
 	/**
 	 * °ëÔ²µÄ°ë¾¶
 	 */
-	private float radius;
+	private float radius = 100;
 	private float insideLeft;
 	private float insideRight;
 	private float insideTop;
 	private float insideBottom;
+	/**
+	 * ±ß¿òËùÔÚµÄ¾ØÐÎ
+	 */
+	private RectF mBorderRect = new RectF();
+	/**
+	 * ±ß¿òµÄ»­±Ê
+	 */
+	private Paint mBorderPaint;
+	/**
+	 * Ô²ÐÎÍ·ÏñµÄ±ß¿ò´ÖÏ¸
+	 */
+	private float borderWidth = 5;
 
 	public MyDrawSemicircle(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -49,16 +65,20 @@ public class MyDrawSemicircle extends View {
 		outRectPaint = new Paint(Paint.UNDERLINE_TEXT_FLAG);
 		outRectPaint.setColor(0xFFFF0000);
 		outRectPaint.setStyle(Paint.Style.FILL);
-		
+
 		insideRectPaint = new Paint(Paint.UNDERLINE_TEXT_FLAG);
-		insideRectPaint.setColor(0x0000FF00);
-//		insideRectPaint.setColor(0xFF00FF00);
+		// insideRectPaint.setColor(0x0000FF00);
+		insideRectPaint.setColor(0xFF00FF00);
 		insideRectPaint.setStyle(Paint.Style.STROKE);
-		
+
 		semiCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//		semiCirclePaint.setColor(0xFF0000FF);
 		semiCirclePaint.setColor(0xFFFFFFFF);
 		semiCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+		mBorderPaint = new Paint(Paint.UNDERLINE_TEXT_FLAG);
+		mBorderPaint.setStyle(Paint.Style.STROKE);
+		mBorderPaint.setColor(0xFF00FF00);
+		mBorderPaint.setStrokeWidth(borderWidth);
 	}
 
 	@Override
@@ -66,9 +86,27 @@ public class MyDrawSemicircle extends View {
 		super.onDraw(canvas);
 		canvas.drawRect(outRect, outRectPaint);// »­¾ØÐÎ
 		canvas.drawRect(insideRect, insideRectPaint);
-		canvas.drawArc(insideRect, 180, 180, false, semiCirclePaint);// »­°ëÔ²
-//		canvas.drawArc(outRect, 180, 180, false, semiCirclePaint);// »­°ëÔ²
+		// canvas.drawArc(insideRect, 180, 180, false, semiCirclePaint);// »­°ëÔ²
+		canvas.drawArc(insideRect, 0, 360, false, semiCirclePaint);// »­°ëÔ²
+		//»­Ô²ÐÎ±ß¿ò
+//		canvas.drawCircle(insideLeft + radius, insideRight - radius - 3 * getPaddingRight() + borderWidth, radius, mBorderPaint);
+		canvas.drawCircle(insideLeft + radius, insideBottom-radius, radius, mBorderPaint);
+		
+		Bitmap bitmap=BitmapFactory.decodeResource(getResources(), R.drawable.testqn);
+		Log.i("semiCircle:","===========bitmap:"+bitmap);
+		
+		/**
+		 * ²Ã¼ôbitmap
+		 */
+		Path path = new Path();
+//		path.addCircle(radius, radius, radius, Path.Direction.CW);
+		path.addCircle(insideLeft + radius, insideBottom-radius, radius, Path.Direction.CW);
+		canvas.clipPath(path);
+		//TODO:Ëõ·Åbitmap£¬Ê¹Ö®ÄÜÕý³£ÏÔÊ¾ÔÚÔ²ÐÎ¿òÖÐ
+		canvas.drawBitmap(bitmap, new Matrix(), mBorderPaint);
 	}
+
+
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -77,15 +115,18 @@ public class MyDrawSemicircle extends View {
 		float xPad = getPaddingLeft() + getPaddingRight();
 		float yPad = getPaddingTop() + getPaddingBottom();
 		dimension = Math.min(w - xPad, (h - yPad) * 2);
-		radius = 60;
 		insideLeft = w / 2 - radius;
 		insideRight = w / 2 + radius;
 		insideTop = dimension - getPaddingBottom() - radius;
-		insideBottom = dimension - getPaddingBottom();
-		
-		outRect = new RectF(getPaddingLeft(), getPaddingTop(), w-getPaddingRight(), h-getPaddingBottom());
-		float insideRectDownH = dimension-getPaddingBottom()-getPaddingTop()+150;
-		insideRect = new RectF(w/2-radius, h-radius-getPaddingTop(), w/2+radius,  h+radius-getPaddingBottom());
+		insideBottom = h - getPaddingBottom();
+
+		outRect = new RectF(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
+		float insideRectDownH = dimension - getPaddingBottom() - getPaddingTop() + 150;
+		// insideRect = new RectF(w/2-radius, h-radius-getPaddingTop(),
+		// w/2+radius, h+radius-getPaddingBottom());
+		insideRect = new RectF(w / 2 - radius, h - 2 * radius - getPaddingTop(), w / 2 + radius, h - getPaddingBottom());
+		// insideRect = new RectF(w/2-radius, h-getPaddingTop(), w/2+radius,
+		// h-getPaddingBottom());
 	}
 
 	@Override
@@ -100,4 +141,20 @@ public class MyDrawSemicircle extends View {
 		// super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 	}
+	
+	/**
+	 * ÔÚÔ²ÐÎ±ß¿òÖÐÉèÖÃÍ¼Æ¬
+	 * @param bitmap
+	 */
+	public void setImageBitmap(Bitmap bitmap) {
+		Bitmap destBitmap = Bitmap.createBitmap((int)radius, (int)radius, bitmap.getConfig());
+		Canvas canvas = new Canvas(destBitmap);
+		Log.i("semiCircle:","=================:"+(int)radius);
+		Log.i("semiCircle:","===========canvas:"+canvas);
+		canvas.drawBitmap(bitmap, new Matrix(), mBorderPaint);
+		Log.i("semiCircle:","===========canvas:"+canvas);
+//		canvas.save();
+//		canvas.
+	}
+	
 }
