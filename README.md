@@ -55,3 +55,16 @@ Create a semiCircle using code
 ```java
     canvas.drawArc(insideRect, 180, 180, false, semiCirclePaint);
 ```
+###使用方法
+------------------------------------------------------
+#####在布局中：
+```xml
+<com.itcode.semiCircle.MyDrawSemicircle
+    android:layout_width="200dp"
+    android:layout_height="100dp"
+    android:layout_marginTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp" />
+```
